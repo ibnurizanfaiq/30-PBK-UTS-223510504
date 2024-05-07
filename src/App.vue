@@ -39,9 +39,9 @@ const edittask = (index) => {
   <section id="todo">
     <div class="card mt-3">
       <div class="card-header bg-success text-white">
-        <h1>Your Plan Activity</h1>
+        <h1>Masukan Aktivitas Kamu</h1>
       </div>
-
+      <br>
       <div class="row">
         <div class="col">
           <input type="text" class="form-control" v-model="Rencana" placeholder="Rencana">
@@ -58,6 +58,7 @@ const edittask = (index) => {
       </div>
 
       <div class="card-body">
+        <br>
         <table class="table table-striped">
           <thead class="thead-dark">
             <tr>
@@ -88,5 +89,8 @@ const edittask = (index) => {
 <style scoped>
 .done {
   text-decoration: line-through;
+}
+h1{
+  text-align: center;
 }
 </style>
