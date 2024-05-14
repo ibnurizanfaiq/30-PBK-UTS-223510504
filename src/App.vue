@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 const Rencana = ref('');
 const Waktu = ref('');
@@ -7,6 +7,10 @@ const Catatan = ref('');
 const todos = ref([]);
 const editingIndex = ref(null);
 const selectedMenu = ref('todos');
+const users = ref([]);
+const selectedUser = ref(null);
+const userPosts = ref([]);
+const loading = ref(true);
 
 const addtask = () => {
   if (editingIndex.value !== null) {
@@ -34,6 +38,45 @@ const edittask = (index) => {
   Catatan.value = todos.value[index].Catatan;
   editingIndex.value = index;
 };
+
+onMounted(async () => {
+  try {
+    const response = await fetch('https://jsonplaceholder.typicode.com/users');
+    if (response.ok) {
+      const data = await response.json();
+      users.value = data;
+      loading.value = false;
+    } else {
+      throw new Error('Failed to fetch users');
+    }
+  } catch (error) {
+    console.error(error);
+    loading.value = false;
+  }
+});
+
+const fetchPosts = async () => {
+  if (selectedUser.value !== null) {
+    loading.value = true;
+    try {
+      const response = await fetch(`https://jsonplaceholder.typicode.com/posts?userId=${selectedUser.value}`);
+      if (response.ok) {
+        const data = await response.json();
+        userPosts.value = data;
+        loading.value = false;
+      } else {
+        throw new Error('Failed to fetch user posts');
+      }
+    } catch (error) {
+      console.error(error);
+      loading.value = false;
+    }
+  }
+};
+
+watch(selectedUser, () => {
+  fetchPosts();
+});
 </script>
 
 <template>
@@ -92,8 +135,26 @@ const edittask = (index) => {
       </section>>
     </section>
     <section v-else-if="selectedMenu === 'post'">
-      <!-- Your Post Component -->
-      <!-- You can create another component for handling posts or reuse existing ones -->
+      <div class="container mt-3">
+        <h1 class="text-center">Postingan Users</h1>
+        <div class="form-group">
+          <label for="userSelect">Pilih User:</label>
+          <select class="form-control" id="userSelect" v-model="selectedUser" @change="fetchPosts">
+            <option v-for="user in users" :value="user.id" :key="user.id">{{ user.name }}</option>
+          </select>
+        </div>
+        <div v-if="loading" class="text-center">Loading...</div>
+        <div v-else>
+          <div v-for="(post, index) in userPosts" :key="index" class="card mt-3">
+            <div class="card-header">
+              <h5>{{ post.title }}</h5>
+            </div>
+            <div class="card-body">
+              <p>{{ post.body }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   </div>
   
