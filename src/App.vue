@@ -1,50 +1,34 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref } from 'vue';
+import TodoList from './components/TodoList.vue';
+import UserPosts from './components/UserPosts.vue';
 
-const Rencana = ref('');
-const Waktu = ref('');
-const Catatan = ref('');
-const todos = ref([]);
-const editingIndex = ref(null);
 const selectedMenu = ref('todos');
+const todos = ref([]);
 const users = ref([]);
-const selectedUser = ref(null);
-const userPosts = ref([]);
 const loading = ref(true);
 
-const addtask = () => {
-  if (editingIndex.value !== null) {
-    todos.value[editingIndex.value] = { Rencana: Rencana.value, Waktu: Waktu.value, Catatan: Catatan.value };
-    editingIndex.value = null;
+const handleAddOrUpdateTask = (task, index) => {
+  if (index !== null) {
+    todos.value[index] = task;
   } else {
-    todos.value.push({ Rencana: Rencana.value, Waktu: Waktu.value, Catatan: Catatan.value });
+    todos.value.push(task);
   }
-  Rencana.value = '';
-  Waktu.value = '';
-  Catatan.value = '';
 };
 
-const removetask = (index) => {
+const handleRemoveTask = (index) => {
   todos.value.splice(index, 1);
 };
 
-const toggleDone = (index) => {
+const handleToggleDone = (index) => {
   todos.value[index].done = !todos.value[index].done;
 };
 
-const edittask = (index) => {
-  Rencana.value = todos.value[index].Rencana;
-  Waktu.value = todos.value[index].Waktu;
-  Catatan.value = todos.value[index].Catatan;
-  editingIndex.value = index;
-};
-
-onMounted(async () => {
+const fetchUsers = async () => {
   try {
     const response = await fetch('https://jsonplaceholder.typicode.com/users');
     if (response.ok) {
-      const data = await response.json();
-      users.value = data;
+      users.value = await response.json();
       loading.value = false;
     } else {
       throw new Error('Failed to fetch users');
@@ -53,30 +37,9 @@ onMounted(async () => {
     console.error(error);
     loading.value = false;
   }
-});
-
-const fetchPosts = async () => {
-  if (selectedUser.value !== null) {
-    loading.value = true;
-    try {
-      const response = await fetch(`https://jsonplaceholder.typicode.com/posts?userId=${selectedUser.value}`);
-      if (response.ok) {
-        const data = await response.json();
-        userPosts.value = data;
-        loading.value = false;
-      } else {
-        throw new Error('Failed to fetch user posts');
-      }
-    } catch (error) {
-      console.error(error);
-      loading.value = false;
-    }
-  }
 };
 
-watch(selectedUser, () => {
-  fetchPosts();
-});
+fetchUsers();
 </script>
 
 <template>
@@ -86,94 +49,25 @@ watch(selectedUser, () => {
       <button class="btn btn-light" @click="selectedMenu = 'post'">Post</button>
     </nav>
     <section v-if="selectedMenu === 'todos'">
-      <section id="todo">
-        <div class="card mt-3">
-          <div class="card-header bg-success text-white">
-            <h1>Masukan Aktivitas Kamu</h1>
-          </div>
-          <br>
-          <div class="row">
-            <div class="col">
-              <input type="text" class="form-control" v-model="Rencana" placeholder="Rencana">
-            </div>
-            <div class="col">
-              <input type="text" class="form-control" v-model="Waktu" placeholder="Waktu" >
-            </div>
-            <div class="col">
-              <input type="text" class="form-control" v-model="Catatan" placeholder="Catatan" >
-            </div>
-            <div class="col">
-              <button class="btn btn-primary" @click="addtask" type="submit">{{ editingIndex !== null ? 'Update' : 'Submit' }}</button>
-            </div>
-          </div>
-
-          <div class="card-body">
-            <br>
-            <table class="table table-striped">
-              <thead class="thead-dark">
-                <tr>
-                  <th>Rencana</th>
-                  <th>Waktu</th>
-                  <th>Catatan</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(todo, index) in todos" :key="index">
-                  <td :class="{ 'done': todo.done }">{{ todo.Rencana }}</td>
-                  <td :class="{ 'done': todo.done }">{{ todo.Waktu }}</td>
-                  <td :class="{ 'done': todo.done }">{{ todo.Catatan }}</td>
-                  <td>
-                    <button class="btn btn-success" @click="toggleDone(index)">{{ todo.done ? 'Undone' : 'Done' }}</button>
-                    <button class="btn btn-warning" @click="edittask(index)">Edit</button>
-                    <button class="btn btn-danger" @click="removetask(index)">Remove</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>>
+      <TodoList
+        :todos="todos"
+        @add-or-update-task="handleAddOrUpdateTask"
+        @remove-task="handleRemoveTask"
+        @toggle-done="handleToggleDone"
+      />
     </section>
     <section v-else-if="selectedMenu === 'post'">
-      <div class="container mt-3">
-        <h1 class="text-center">Postingan Users</h1>
-        <div class="form-group">
-          <label for="userSelect">Pilih User:</label>
-          <select class="form-control" id="userSelect" v-model="selectedUser" @change="fetchPosts">
-            <option v-for="user in users" :value="user.id" :key="user.id">{{ user.name }}</option>
-          </select>
-        </div>
-        <div v-if="loading" class="text-center">Loading...</div>
-        <div v-else>
-          <div v-for="(post, index) in userPosts" :key="index" class="card mt-3">
-            <div class="card-header">
-              <h5>{{ post.title }}</h5>
-            </div>
-            <div class="card-body">
-              <p>{{ post.body }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <UserPosts :users="users" :loading="loading" />
     </section>
   </div>
-  
 </template>
 
-
 <style scoped>
-.done {
-  text-decoration: line-through;
-}
-h1{
-  text-align: center;
-}
 #nav {
   display: flex;
   justify-content: center;
 }
-
 #nav button {
-  margin: 0 10px; /* Adjust the margin as needed */
+  margin: 0 10px;
 }
 </style>
