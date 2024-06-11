@@ -2,7 +2,9 @@
 import { ref } from 'vue';
 import TodoList from './components/TodoList.vue';
 import UserPosts from './components/UserPosts.vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const selectedMenu = ref('todos');
 const todos = ref([]);
 const users = ref([]);
@@ -23,6 +25,14 @@ const handleRemoveTask = (index) => {
 const handleToggleDone = (index) => {
   todos.value[index].done = !todos.value[index].done;
 };
+const navigateToPost = () => {
+  selectedMenu.value = 'post';
+  router.push('/Post');
+};
+const navigateToTodos = () => {
+  selectedMenu.value = 'todos';
+  router.push('/todos');
+};
 
 const fetchUsers = async () => {
   try {
@@ -31,7 +41,7 @@ const fetchUsers = async () => {
       users.value = await response.json();
       loading.value = false;
     } else {
-      throw new Error('Failed to fetch users');
+      throw new Error('gagal fetch data dari users');
     }
   } catch (error) {
     console.error(error);
@@ -45,8 +55,8 @@ fetchUsers();
 <template>
   <div>
     <nav class="navbar navbar-expand-lg navbar-light bg-info" id="nav">
-      <button class="btn btn-light" @click="selectedMenu = 'todos'">Todos</button>
-      <button class="btn btn-light" @click="selectedMenu = 'post'">Post</button>
+      <button class="btn btn-light" @click="navigateToTodos">Todos</button>
+      <button class="btn btn-light" @click="navigateToPost">Post</button>
     </nav>
     <section v-if="selectedMenu === 'todos'">
       <TodoList
