@@ -1,8 +1,9 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref} from 'vue';
 
 const props = defineProps({
   todos: Array
+  
 });
 
 const emit = defineEmits(['add-or-update-task', 'remove-task', 'toggle-done']);
