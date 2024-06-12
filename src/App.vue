@@ -1,4 +1,9 @@
 <script setup>
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+const isHomeRoute = computed(() => route.path === '/');
 </script>
 
 <template>
@@ -24,10 +29,32 @@
       </div>
     </div>
   </nav>
+  <div v-if="isHomeRoute" class="land">
+      <h1>Project UAS</h1>
+      <h2>Ibnu Rizan Faiq</h2>
+  </div>
   <router-view />
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+.land {
+  font-family: 'Roboto', sans-serif;
+  text-align: center;
+  margin-top: 100px; /* Untuk memberi jarak dari navbar */
+  color: #333;
+}
+
+.land h1 {
+  font-size: 48px;
+  font-weight: bold;
+}
+
+.land h2 {
+  font-size: 36px;
+  font-weight: bold;
+}
 .navbar-brand {
   font-weight: bold;
 }
