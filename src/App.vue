@@ -5,18 +5,22 @@ import { useTodoStore } from './store/todoStore';
 
 const router = useRouter();
 const selectedMenu = ref('todos');
-const todoStore = useTodoStore();
-
-const navigateToPost = () => {
-  selectedMenu.value = 'post';
-  router.push('/post');
-};
+const TodoStore = useTodoStore();
 
 const navigateToTodos = () => {
   selectedMenu.value = 'todos';
   router.push('/todos');
 };
 
+const navigateToPost = () => {
+  selectedMenu.value = 'post';
+  router.push('/post');
+};
+
+const navigateToAlbums = () => {
+  selectedMenu.value = 'albums';
+  router.push('/albums');
+};
 </script>
 
 <template>
@@ -24,6 +28,7 @@ const navigateToTodos = () => {
     <nav class="navbar navbar-expand-lg navbar-light bg-info" id="nav">
       <button class="btn btn-light" @click="navigateToTodos">Todos</button>
       <button class="btn btn-light" @click="navigateToPost">Post</button>
+      <button class="btn btn-light" @click="navigateToAlbums">Albums</button>
     </nav>
     <RouterView />
   </div>
