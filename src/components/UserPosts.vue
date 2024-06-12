@@ -1,15 +1,25 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
-
-const props = defineProps({
-  users: Array,
-  loading: Boolean
-});
-
+const users = ref([]);
 const selectedUser = ref(null);
 const userPosts = ref([]);
-const loading = ref(props.loading);
+const loading = ref(true);
+
+const fetchUsers = async () => {
+  try {
+    const response = await fetch('https://jsonplaceholder.typicode.com/users');
+    if (response.ok) {
+      users.value = await response.json();
+      loading.value = false;
+    } else {
+      throw new Error('Failed to fetch users');
+    }
+  } catch (error) {
+    console.error(error);
+    loading.value = false;
+  }
+};
 
 const fetchPosts = async () => {
   if (selectedUser.value !== null) {
@@ -29,6 +39,7 @@ const fetchPosts = async () => {
   }
 };
 
+onMounted(fetchUsers);
 watch(selectedUser, fetchPosts);
 
 </script>
@@ -55,3 +66,12 @@ watch(selectedUser, fetchPosts);
     </div>
   </div>
 </template>
+
+<style scoped>
+.text-center {
+  text-align: center;
+}
+.mt-3 {
+  margin-top: 1rem;
+}
+</style>

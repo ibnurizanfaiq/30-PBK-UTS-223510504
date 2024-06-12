@@ -1,12 +1,8 @@
 <script setup>
-import { ref} from 'vue';
+import { ref } from 'vue';
+import { useTodoStore } from '../store/todoStore';
 
-const props = defineProps({
-  todos: Array
-  
-});
-
-const emit = defineEmits(['add-or-update-task', 'remove-task', 'toggle-done']);
+const todoStore = useTodoStore();
 
 const Rencana = ref('');
 const Waktu = ref('');
@@ -14,7 +10,7 @@ const Catatan = ref('');
 const editingIndex = ref(null);
 
 const addTask = () => {
-  emit('add-or-update-task', { Rencana: Rencana.value, Waktu: Waktu.value, Catatan: Catatan.value }, editingIndex.value);
+  todoStore.addOrUpdateTask({ Rencana: Rencana.value, Waktu: Waktu.value, Catatan: Catatan.value }, editingIndex.value);
   Rencana.value = '';
   Waktu.value = '';
   Catatan.value = '';
@@ -22,13 +18,12 @@ const addTask = () => {
 };
 
 const editTask = (index) => {
-  const task = props.todos[index];
+  const task = todoStore.todos[index];
   Rencana.value = task.Rencana;
   Waktu.value = task.Waktu;
   Catatan.value = task.Catatan;
   editingIndex.value = index;
 };
-
 </script>
 
 <template>
@@ -65,14 +60,14 @@ const editTask = (index) => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(todo, index) in todos" :key="index">
+            <tr v-for="(todo, index) in todoStore.todos" :key="index">
               <td :class="{ 'done': todo.done }">{{ todo.Rencana }}</td>
               <td :class="{ 'done': todo.done }">{{ todo.Waktu }}</td>
               <td :class="{ 'done': todo.done }">{{ todo.Catatan }}</td>
               <td>
-                <button class="btn btn-success" @click="$emit('toggle-done', index)">{{ todo.done ? 'Undone' : 'Done' }}</button>
+                <button class="btn btn-success" @click="todoStore.toggleDone(index)">{{ todo.done ? 'Undone' : 'Done' }}</button>
                 <button class="btn btn-warning" @click="editTask(index)">Edit</button>
-                <button class="btn btn-danger" @click="$emit('remove-task', index)">Remove</button>
+                <button class="btn btn-danger" @click="todoStore.removeTask(index)">Remove</button>
               </td>
             </tr>
           </tbody>

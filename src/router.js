@@ -3,10 +3,10 @@ import TodoList from './components/TodoList.vue';
 import Post from './components/UserPosts.vue';
 
 const routes = [
-  { path: '/todos', component: TodoList },
-  { path: '/post', component: Post }
-  
+  { path: '/todos', name: 'Todos', component: TodoList },
+  { path: '/post', name: 'Post', component: Post }
 ];
+
 
 const router = createRouter({
   history: createWebHistory(),
