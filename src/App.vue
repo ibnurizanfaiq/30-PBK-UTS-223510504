@@ -9,7 +9,7 @@ const isHomeRoute = computed(() => route.path === '/');
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-      <h1 class="navbar-brand"><i class="bi bi-cpu-fill"></i>  Ibnu Rizan</h1>
+      <router-Link to ="/" class="navbar-brand"><i class="bi bi-cpu-fill"></i>  Ibnu Rizan</router-Link>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
